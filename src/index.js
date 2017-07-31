@@ -33,13 +33,15 @@ var getEndpoints = function (app, path, endpoints) {
   endpoints = endpoints || []
   path = path || ''
 
-  stack.forEach(function (val) {
+  if (stack){
+    stack.forEach(function (val) {
     if (val.route) {
       endpoints.push({
         path: path + (path && val.route.path === '/' ? '' : val.route.path),
         methods: getRouteMethods(val.route)
       })
-    } else if (val.name === 'router' || val.name === 'bound dispatch') {
+    } else if (val.name === 'router' || val.name === 'bound dispatch' || val.name === 'serveStatic' || val.name === '<anonymous>' ) {
+    //} else if ( val.name === 'serveStatic' ) {
       var newPath = regExp.exec(val.regexp)
 
       if (newPath) {
@@ -66,7 +68,15 @@ var getEndpoints = function (app, path, endpoints) {
       }
     }
   })
-
+  } else {
+// Output static endpoints
+      if (path){
+      endpoints.push({
+          path: path,
+          methods: 'GET'
+      })
+      }
+  }
   return endpoints
 }
 
